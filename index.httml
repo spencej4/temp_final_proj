@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+<head>
+   <meta charset="utf-8">
+   <title>Food Safety Ratings</title>
+   <script src='jquery.min.js'></script>
+	
+	
+   
+</head>
+<body>
+<p></p>
+<script src='script.js'></script>
+</body>
+</html>
