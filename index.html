@@ -4,11 +4,11 @@
    <meta charset="utf-8">
    <title>Food Safety Ratings</title>
    <script src='jquery.min.js'></script>
+   <link rel="stylesheet" type="text/css" href="style.css">
    <style>
         #map {
-          height: 80%;
+          height: 70%;
         }
-        /* Optional: Makes the sample page fill the window. */
         html, body {
           height: 100%;
           margin: 0;
@@ -18,36 +18,6 @@
   </head>
   <body>
     <div id="map"></div>
-    <script>
-      function initMap() {
-
-        // load the map
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: 47.608013, lng: -122.335167},
-          zoom: 12,
-          styles: mapStyle
-        });
-
-        var mapStyle = [{
-          'featureType': 'all',
-          'elementType': 'all',
-          'stylers': [{'visibility': 'off'}]
-        }, {
-          'featureType': 'landscape',
-          'elementType': 'geometry',
-          'stylers': [{'visibility': 'on'}, {'color': '#fcfcfc'}]
-        }, {
-          'featureType': 'water',
-          'elementType': 'labels',
-          'stylers': [{'visibility': 'off'}]
-        }, {
-          'featureType': 'water',
-          'elementType': 'geometry',
-          'stylers': [{'visibility': 'on'}, {'hue': '#5f94ff'}, {'lightness': 60}]
-        }];
-      }
-
-    </script>
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCPyHPLQu2ynI-HA2NXoMkgdl2v8wJvNYA&callback=initMap">
     </script>
