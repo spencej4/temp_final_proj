@@ -15,8 +15,18 @@
           padding: 0;
         }
    </style>
+   <h1 id=title>King County Food Safety Rating Navigator</h1> 
   </head>
   <body>
+    <div class="sidenav">
+      <form id="inputForm">
+        ZIP Code:<br>
+        <input type="text" name="searchZIP"><br><br>
+        Food Violation:<br>
+        <input type="text" name="searchViolation" value="1600 - Proper cooling procedure"><br><br>
+        <input type="submit" id="submitButton" value="Search">
+      </form>
+    </div>
     <div id="map"></div>
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCPyHPLQu2ynI-HA2NXoMkgdl2v8wJvNYA&callback=initMap">
