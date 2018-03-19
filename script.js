@@ -64,16 +64,13 @@ $( "#inputForm" ).submit(function(e) {
                    title: location.name
 
                });
-     
-                // start of new on 03/16/18
-
+                // zooms map in to marker location when user clicks marker
                 marker.addListener('click', function() {
                     console.log('click event registered');
                     console.log(marker.title); // not working yet. // need to get each location title on click of marker
                      map.setZoom(20);
                      map.setCenter(marker.getPosition());
                 });
-                //end of new
             });
         });
       });
@@ -195,3 +192,4 @@ $( "#inputForm" ).submit(function(e) {
     var tc = ts*t;
     return b+c*(tc + -3*ts + 3*t);
   }
+
