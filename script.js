@@ -56,14 +56,22 @@ $( "#inputForm" ).submit(function(e) {
         .done(function(){
           //alert('ajax call performed'); //for testing
             $.each(myData, function(i, entry) {
-               console.log(entry);
-               var marker = new google.maps.Marker({
+               //console.log(entry); // for testing
+                   let marker = new google.maps.Marker({
                    position: new google.maps.LatLng(entry.latitude, 
                                                     entry.longitude),
                    map: map,
                    title: location.name
+
                });
-           });
+                // zooms map in to marker location when user clicks marker
+                marker.addListener('click', function() {
+                    console.log('click event registered');
+                    console.log(marker.title); // not working yet. // need to get each location title on click of marker
+                     map.setZoom(20);
+                     map.setCenter(marker.getPosition());
+                });
+            });
         });
       });
 
