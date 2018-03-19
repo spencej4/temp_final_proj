@@ -193,5 +193,3 @@ $( "#inputForm" ).submit(function(e) {
     return b+c*(tc + -3*ts + 3*t);
   }
 
-
-
