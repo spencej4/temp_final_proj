@@ -1,51 +1,73 @@
 <!doctype html>
- <html lang="en">
- <head>
+<html lang="en">
+
+<head>
     <meta charset="utf-8">
     <title>Food Safety Ratings</title>
     <script src='jquery.min.js'></script>
     <link rel="stylesheet" type="text/css" href="style.css">
     <style>
-         #map {
-           height: 70%;
-         }
-         html, body {
-           height: 100%;
-           margin: 0;
-           padding: 0;
-         }
+    #map {
+        height: 70%;
+    }
+    html,
+    body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
     </style>
-   </head>
-   <body>
-    <h1 id=title>King County Food Safety Rating Navigator</h1> 
+</head>
+
+<body>
+    <h1 id=title>King County Food Safety Rating Navigator</h1>
     <div class="sidenav">
-      <form id="inputForm">
-        ZIP Code:<br>
-        <input type="text" name="searchZIP"><br><br>
-        Restaurant Grade:<br>
-        <input list="grade" name="grade">
-        <datalist id="grade">
-          <option value="1">
-          <option value="2">
-          <option value="3">
-          <option value="4">
-        </datalist>
-        <input type="submit" id="submitButton" value="Search">
-      </form>
+        <form id="inputForm">
+            ZIP Code:
+            <br>
+            <input type="text" name="searchZIP">
+            <br>
+            <br>
+            <div class='hidden'> <!-- this div is hidden on purpose! -->
+                Restaurant Grade:
+                <br>
+                <input list="grade" name="grade">
+                <datalist id="grade">
+                    <option value="1"></option>
+                    <option value="2"></option>
+                    <option value="3"></option>
+                    <option value="4"></option>
+                </datalist>
+            </div>
+            <nav id='grade_picker'>
+                <ul id='grades'>
+                    <li data-option="1" id="1"><img src="img/emoji_1.png" class="emoji" id="1" alt="excellent_grade"></img>
+                    </li>
+                    <li data-option="2" id="2"><img src="img/emoji_2.png" class="emoji" id="2" alt="good_grade"></img>
+                    </li>
+                    <li data-option="3" id="3"><img src="img/emoji_3.png" class="emoji" id="3" alt="okay_grade"></img>
+                    </li>
+                    <li data-option="4" id="4"><img src="img/emoji_4.png" class="emoji" id="4" alt="needs_improvement_grade"></img>
+                    </li>
+                </ul>
+            </nav>
+            <input type="submit" id="submitButton" class="button" value="SEARCH">
+            <input type="reset" id="resetButton" class="button" value="RESET">
+        </form>
     </div>
-     <div id="map"></div>
-     <script async defer
-     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCPyHPLQu2ynI-HA2NXoMkgdl2v8wJvNYA&callback=initMap">
-     </script>
-     <br>
-      <div id='wheel'>
-      <img src='img/0.png' style="width:200px">
-      <img src='img/1.png' style="width:200px">
-      <img src='img/2.png' style="width:200px">
-      <img src='img/3.png' style="width:200px"><br>
-      <input type="button" value="Spin The Wheel of Danger" style="float:left; cursor: pointer;"   id='spin_button' />
-      <canvas id="canvas" width="500" height="500"></canvas>
+    <div id="map"></div>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCPyHPLQu2ynI-HA2NXoMkgdl2v8wJvNYA&callback=initMap">
+    </script>
+    <br>
+    <div id='wheel'>
+        <img src='img/0.png' style="width:200px">
+        <img src='img/1.png' style="width:200px">
+        <img src='img/2.png' style="width:200px">
+        <img src='img/3.png' style="width:200px">
+        <br>
+        <input type="button" value="Spin The Wheel of Danger" style="float:left; cursor: pointer;" id='spin_button' />
+        <canvas id="canvas" width="500" height="500"></canvas>
     </div>
-     <script src='script.js'></script>
-   </body>
- </html>
+    <script src='script.js'></script>
+</body>
+</html>
