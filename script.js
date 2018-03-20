@@ -11,7 +11,6 @@ var spinTimeTotal = 0;
 var ctx;
 
 $(window).load(function() {
-
     // Intialize our map
     var center = new google.maps.LatLng(47.608013, -122.335167);
     mapOptions = {
@@ -33,35 +32,67 @@ $(window).load(function() {
         searchParamString = searchParamString.slice(0, -1);
         return ("https://data.kingcounty.gov/resource/gkhn-e8mn.json?" + searchParamString);
     }
+    // get form grade selection on emoji click
+    $('#grades li').click(function(e) {
+        switch (true) {
+            case this.id == "1":
+                // dynamically set value of input grade
+                $("#inputForm").find('input[name="grade"]').val("1");
+                //$("#grades li").slideUp();
+                $(this).siblings().slideUp('fast');
+                break;
+            case this.id == "2":
+                $("#inputForm").find('input[name="grade"]').val("2");
+                $(this).siblings().slideUp('fast');
+                break;
+            case this.id == "3":
+                $("#inputForm").find('input[name="grade"]').val("3");
+                $(this).siblings().slideUp('fast');
+                break;
+            case this.id == "4":
+                $("#inputForm").find('input[name="grade"]').val("4");
+                $(this).siblings().slideUp('fast');
+                break;
+        }
+    });
 
+    // reset form with button click
+    $('#resetButton').click(function() {
+        $('#inputForm')[0].reset();
+        $('#grades li').slideDown("fast");
+    });
 
     // submit form
     $("#inputForm").submit(function(e) {
         e.preventDefault(); //added to prevent form submission from reloading the page
         let inputZIP = $('#inputForm').find('input[name="searchZIP"]').val();
         let inputGrade = $('#inputForm').find('input[name="grade"]').val();
+        //let inputGrade = $('#grades')
         // make sure the key in searchParams is a valid field in the Food Safety database
         let searchParams = {
             'zip_code': inputZIP,
             'grade': inputGrade,
         };
+        myData = "";
+        console.log(myData);
         searchURL = generateURL(searchParams);
 
         // Retrieve our data and plot it
         $.getJSON(searchURL, function(data, textstatus) {
-                //let myData = null; //added during class test // resets data to null onform submission?
                 myData = data;
                 if (myData.length > 0) { implementWheelOfDanger(myData) };
             })
             .done(function() {
+                markersArray = []; // new march 20
+                map.clearOverlays(); // new march 20
                 $.each(myData, function(i, entry) {
-                    //console.log(entry); // for testing // logs each entry to console as an object
+                    console.log(entry); // for testing // logs each entry to console as an object
                     marker = new google.maps.Marker({
                         position: new google.maps.LatLng(entry.latitude, entry.longitude),
                         map: map,
                         title: entry.name
                     });
-
+                    markersArray.push(marker);
                     // zooms map in to marker location when user clicks marker
                     marker.addListener('click', function() {
                         map.setZoom(20);
@@ -75,9 +106,16 @@ $(window).load(function() {
                 // and center map on location
                 map.setCenter({ lat: tempLat, lng: tempLong });
             });
-
         // add error handling
+        searchParams = { 'zipcode': "", 'grade': "" };
     });
+
+    google.maps.Map.prototype.clearOverlays = function() { //new march 20
+        for (var i = 0; i < markersArray.length; i++) {
+            markersArray[i].setMap(null);
+        }
+        markersArray.length = 0;
+    }
 
     function implementWheelOfDanger(myData) {
         let randomRestaurants = [];
@@ -102,9 +140,12 @@ $(window).load(function() {
 
 function getColor(item, maxitem) {
     if (item % 3 === 0) {
-        return '#5e795b' } else if (item % 3 === 1) {
-        return '#edefe5' } else {
-        return '#6e4959' }
+        return '#5e795b'
+    } else if (item % 3 === 1) {
+        return '#edefe5'
+    } else {
+        return '#6e4959'
+    }
 }
 
 function drawRouletteWheel() {
@@ -197,5 +238,3 @@ function easeOut(t, b, c, d) {
     var tc = ts * t;
     return b + c * (tc + -3 * ts + 3 * t);
 }
-
-
