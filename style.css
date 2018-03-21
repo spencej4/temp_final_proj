@@ -86,13 +86,13 @@ body {
     display: inline-block;
     text-align: center;
     clear: both;
-    background-color: #acdbfd;
-    border-radius: 10px;
-    border-style: none;
+    background-color: Transparent;
+    color: #ffffff;
+    border-radius: 5px;
+    border-style: 1px solid #ffffff;
     cursor: pointer;
     font-size: 18px;
 }
-
 #submitButton:focus,
 #resetButton:focus {
     outline:0;
@@ -100,7 +100,10 @@ body {
 
 #submitButton:hover,
 #resetButton:hover {
-    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.14), 0 17px 50px 0 rgba(0,0,0,0.10);
+    background-color: #ffffff;
+    color: #6b5b95;
+    border: 1px solid #6b5b95;
 }
 
 #title {
