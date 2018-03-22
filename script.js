@@ -2,6 +2,7 @@ let map; //The map variable that is an instance of a google.maps.Map is local to
 //this forces global scope of map to be reused and initialized in further function calls
 // The following are used in the Wheel of Danger feature
 var options = [];
+var optionsDetails = [];
 var arc;
 var startAngle = 0;
 var spinTimeout = null;
@@ -9,6 +10,7 @@ var spinArcStart = 10;
 var spinTime = 0;
 var spinTimeTotal = 0;
 var ctx;
+
 
 $(window).load(function() {
     // Intialize our map
@@ -119,21 +121,24 @@ $(window).load(function() {
 
     function implementWheelOfDanger(myData) {
         let randomRestaurants = [];
+        let randomRestaurantsDetails=[];
         let i = 0;
         let j = 0;
         while (i < 5 && j < myData.length - 1) {
             let newIndex = Math.floor(Math.random() * myData.length);
             let newRestaurant = myData[newIndex]["name"];
-            if (randomRestaurants.indexOf(newRestaurant) !== -1) {
+            if (randomRestaurants.indexOf(newRestaurant) !== -1 || !('grade' in  myData[newIndex])) {
                 j++;
                 continue;
-            } //try avoiding duplicates until we run out of restaurants
-            randomRestaurants.push(newRestaurant)
+            } //try avoiding duplicates until we run out of restaurants, skip over rows with no 'grade'
+            randomRestaurants.push(newRestaurant);
+            randomRestaurantsDetails.push(myData[newIndex]);
             i++;
         }
         options = randomRestaurants;
+        optionsDetails = randomRestaurantsDetails;
         arc = Math.PI / (options.length / 2);
-        drawRouletteWheel()
+        drawRouletteWheel();
         document.getElementById("spin_button").addEventListener("click", spin);
     }
 });
@@ -146,6 +151,34 @@ function getColor(item, maxitem) {
     } else {
         return '#6e4959'
     }
+};
+
+function makeRestaurantSummaryText(randomRestaurantsDetails, index) {
+   let grade = randomRestaurantsDetails[index]['grade'];
+   var image_html = "";
+   switch (grade) {
+       case '1':
+         image_html = "<img src='img/emoji_1.png' class='wheel_text'>";
+         break;
+       case '2':
+         image_html = "<img src='img/emoji_2.png' class='wheel_text'>";
+         break;
+       case '3':
+         image_html = "<img src='img/emoji_3.png' class='wheel_text'>";
+         break;
+       case '4': 
+         image_html = "<img src='img/emoji_4.png' class='wheel_text'>";
+         break;  
+     };
+     
+   $('#contact_info').html(
+     image_html+"<br>"+
+     "Contact Info: <br>"+
+     randomRestaurantsDetails[index]['name']+"<br>"+
+     randomRestaurantsDetails[index]['address']+"<br>"+
+     randomRestaurantsDetails[index]['phone']+"<br>"
+   );
+   
 }
 
 function drawRouletteWheel() {
@@ -205,7 +238,7 @@ function drawRouletteWheel() {
 function spin() {
     spinAngleStart = Math.random() * 10 + 10;
     spinTime = 0;
-    spinTimeTotal = Math.random() * 3 + 4 * 1000;
+    spinTimeTotal = Math.random() * 3 + 10 * 1000;
     rotateWheel();
 }
 
@@ -218,7 +251,7 @@ function rotateWheel() {
     var spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal);
     startAngle += (spinAngle * Math.PI / 180);
     drawRouletteWheel();
-    spinTimeout = setTimeout('rotateWheel()', 30);
+    spinTimeout = setTimeout('rotateWheel()', 5);
 }
 
 function stopRotateWheel() {
@@ -231,6 +264,7 @@ function stopRotateWheel() {
     var text = options[index]
     ctx.fillText(text, 250 - ctx.measureText(text).width / 2, 250 + 10);
     ctx.restore();
+    makeRestaurantSummaryText(optionsDetails, index);
 }
 
 function easeOut(t, b, c, d) {

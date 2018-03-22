@@ -59,14 +59,21 @@
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCPyHPLQu2ynI-HA2NXoMkgdl2v8wJvNYA&callback=initMap">
     </script>
     <br>
-    <div id='wheel'>
+    <div id='wheel_comics'>
         <img src='img/0.png' style="width:200px">
         <img src='img/1.png' style="width:200px">
         <img src='img/2.png' style="width:200px">
         <img src='img/3.png' style="width:200px">
         <br>
         <input type="button" value="Spin The Wheel of Danger" style="float:left; cursor: pointer;" id='spin_button' />
-        <canvas id="canvas" width="500" height="500"></canvas>
+    </div>
+    <div class="wheel_format">
+      <div id='wheel_picture'>
+          <canvas id="canvas" width="500" height="500"></canvas>
+      </div>
+      <div id='wheel_text'>
+          <span id='contact_info'></span>
+      </div>
     </div>
     <script src='script.js'></script>
 </body>
