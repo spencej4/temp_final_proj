@@ -66,12 +66,13 @@ $(window).load(function() {
         clearOverlays();
     });
 
-    // Clear map markers and set data to null
+    // Clear the data overalays
     function clearOverlays() {
+        // remove map markers
         for (var i = 0; i < markersArray.length; i++) {
             markersArray[i].setMap(null);
         }
-        myData = null;
+        myData = null; // set data to null
         $('#contact_info').html(""); // clear the contact info
         ctx.clearRect(0, 0, 500, 500); // clear the roulette wheel
     }
@@ -87,7 +88,6 @@ $(window).load(function() {
             'grade': inputGrade,
         };
         myData = null;
-        console.log(myData);
         searchURL = generateURL(searchParams);
 
         // Retrieve our data and plot it
@@ -99,7 +99,7 @@ $(window).load(function() {
                 markersArray = [];
 
                 $.each(myData, function(i, entry) {
-                    console.log(entry); // for testing // logs each entry to console as an object
+                    //console.log(entry); // for testing // logs each entry to console as an object
                     marker = new google.maps.Marker({
                         position: new google.maps.LatLng(entry.latitude, entry.longitude),
                         map: map,
@@ -129,7 +129,7 @@ $(window).load(function() {
         let randomRestaurantsDetails = [];
         let i = 0;
         let j = 0;
-        while (i < 5 && j < myData.length - 1) {
+        while (i < 15 && j < myData.length - 1) {
             let newIndex = Math.floor(Math.random() * myData.length);
             let newRestaurant = myData[newIndex]["name"];
             if (randomRestaurants.indexOf(newRestaurant) !== -1 || !('grade' in myData[newIndex])) {
@@ -141,6 +141,7 @@ $(window).load(function() {
             i++;
         }
         options = randomRestaurants;
+        numOptions = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]; 
         optionsDetails = randomRestaurantsDetails;
         arc = Math.PI / (options.length / 2);
         drawRouletteWheel();
@@ -201,9 +202,9 @@ function drawRouletteWheel() {
 
         ctx.font = 'bold 12px Helvetica, Arial';
 
-        for (var i = 0; i < options.length; i++) {
+        for (var i = 0; i < numOptions.length; i++) {
             var angle = startAngle + i * arc;
-            ctx.fillStyle = getColor(i, options.length);
+            ctx.fillStyle = getColor(i, numOptions.length);
 
             ctx.beginPath();
             ctx.arc(250, 250, outsideRadius, angle, angle + arc, false);
@@ -220,7 +221,7 @@ function drawRouletteWheel() {
             ctx.translate(250 + Math.cos(angle + arc / 2) * textRadius,
                 250 + Math.sin(angle + arc / 2) * textRadius);
             ctx.rotate(angle + arc / 2 + Math.PI / 2);
-            var text = options[i];
+            var text = numOptions[i];
             ctx.fillText(text, -ctx.measureText(text).width / 2, 0);
             ctx.restore();
         }
@@ -277,4 +278,5 @@ function easeOut(t, b, c, d) {
     var tc = ts * t;
     return b + c * (tc + -3 * ts + 3 * t);
 }
+
 
