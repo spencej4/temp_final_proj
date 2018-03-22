@@ -21,7 +21,7 @@ $(window).load(function() {
     }
     var map = new google.maps.Map(document.getElementById("map"), mapOptions);
 
-    //this uses both the key and value strings to build the URL
+    // This uses both the key and value strings to build the URL
     function generateURL(searchParams) {
         let searchParamString = "";
         for (let key in searchParams) {
@@ -34,11 +34,12 @@ $(window).load(function() {
         searchParamString = searchParamString.slice(0, -1);
         return ("https://data.kingcounty.gov/resource/gkhn-e8mn.json?" + searchParamString);
     }
-    // get restaurant grade when user clicks smiley face
+
+    // Get restaurant grade when user clicks smiley face
     $('#grades li').click(function(e) {
         switch (true) {
             case this.id == "1":
-                // dynamically set value of input grade
+                // dynamically set value of input grade (hardcoded)
                 $("#inputForm").find('input[name="grade"]').val("1");
                 //$("#grades li").slideUp();
                 $(this).siblings().slideUp('fast');
@@ -58,33 +59,34 @@ $(window).load(function() {
         }
     });
 
-    // reset form and remove map markers
+    // Reset form and remove map markers
     $('#resetButton').click(function() {
         $('#inputForm')[0].reset();
         $('#grades li').slideDown("fast");
         clearOverlays();
     });
 
-    // clear map markers and set data to null
+    // Clear map markers and set data to null
     function clearOverlays() {
         for (var i = 0; i < markersArray.length; i++) {
             markersArray[i].setMap(null);
         }
         myData = null;
+        $('#contact_info').html(""); // clear the contact info
+        ctx.clearRect(0, 0, 500, 500); // clear the roulette wheel
     }
 
-    // submit form
+    // User submits form
     $("#inputForm").submit(function(e) {
         e.preventDefault(); //added to prevent form submission from reloading the page
         let inputZIP = $('#inputForm').find('input[name="searchZIP"]').val();
         let inputGrade = $('#inputForm').find('input[name="grade"]').val();
-        //let inputGrade = $('#grades')
         // make sure the key in searchParams is a valid field in the Food Safety database
         let searchParams = {
             'zip_code': inputZIP,
             'grade': inputGrade,
         };
-        myData = "";
+        myData = null;
         console.log(myData);
         searchURL = generateURL(searchParams);
 
@@ -275,3 +277,4 @@ function easeOut(t, b, c, d) {
     var tc = ts * t;
     return b + c * (tc + -3 * ts + 3 * t);
 }
+
