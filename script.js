@@ -34,7 +34,7 @@ $(window).load(function() {
         searchParamString = searchParamString.slice(0, -1);
         return ("https://data.kingcounty.gov/resource/gkhn-e8mn.json?" + searchParamString);
     }
-    // get form grade selection on emoji click
+    // get restaurant grade when user clicks smiley face
     $('#grades li').click(function(e) {
         switch (true) {
             case this.id == "1":
@@ -58,11 +58,20 @@ $(window).load(function() {
         }
     });
 
-    // reset form with button click
+    // reset form and remove map markers
     $('#resetButton').click(function() {
         $('#inputForm')[0].reset();
         $('#grades li').slideDown("fast");
+        clearOverlays();
     });
+
+    // clear map markers and set data to null
+    function clearOverlays() {
+        for (var i = 0; i < markersArray.length; i++) {
+            markersArray[i].setMap(null);
+        }
+        myData = null;
+    }
 
     // submit form
     $("#inputForm").submit(function(e) {
@@ -85,8 +94,8 @@ $(window).load(function() {
                 if (myData.length > 0) { implementWheelOfDanger(myData) };
             })
             .done(function() {
-                markersArray = []; // new march 20
-                map.clearOverlays(); // new march 20
+                markersArray = [];
+
                 $.each(myData, function(i, entry) {
                     console.log(entry); // for testing // logs each entry to console as an object
                     marker = new google.maps.Marker({
@@ -112,22 +121,16 @@ $(window).load(function() {
         searchParams = { 'zipcode': "", 'grade': "" };
     });
 
-    google.maps.Map.prototype.clearOverlays = function() { //new march 20
-        for (var i = 0; i < markersArray.length; i++) {
-            markersArray[i].setMap(null);
-        }
-        markersArray.length = 0;
-    }
 
     function implementWheelOfDanger(myData) {
         let randomRestaurants = [];
-        let randomRestaurantsDetails=[];
+        let randomRestaurantsDetails = [];
         let i = 0;
         let j = 0;
         while (i < 5 && j < myData.length - 1) {
             let newIndex = Math.floor(Math.random() * myData.length);
             let newRestaurant = myData[newIndex]["name"];
-            if (randomRestaurants.indexOf(newRestaurant) !== -1 || !('grade' in  myData[newIndex])) {
+            if (randomRestaurants.indexOf(newRestaurant) !== -1 || !('grade' in myData[newIndex])) {
                 j++;
                 continue;
             } //try avoiding duplicates until we run out of restaurants, skip over rows with no 'grade'
@@ -154,31 +157,31 @@ function getColor(item, maxitem) {
 };
 
 function makeRestaurantSummaryText(randomRestaurantsDetails, index) {
-   let grade = randomRestaurantsDetails[index]['grade'];
-   var image_html = "";
-   switch (grade) {
-       case '1':
-         image_html = "<img src='img/emoji_1.png' class='wheel_text'>";
-         break;
-       case '2':
-         image_html = "<img src='img/emoji_2.png' class='wheel_text'>";
-         break;
-       case '3':
-         image_html = "<img src='img/emoji_3.png' class='wheel_text'>";
-         break;
-       case '4': 
-         image_html = "<img src='img/emoji_4.png' class='wheel_text'>";
-         break;  
-     };
-     
-   $('#contact_info').html(
-     image_html+"<br>"+
-     "Contact Info: <br>"+
-     randomRestaurantsDetails[index]['name']+"<br>"+
-     randomRestaurantsDetails[index]['address']+"<br>"+
-     randomRestaurantsDetails[index]['phone']+"<br>"
-   );
-   
+    let grade = randomRestaurantsDetails[index]['grade'];
+    var image_html = "";
+    switch (grade) {
+        case '1':
+            image_html = "<img src='img/emoji_1.png' class='wheel_text'>";
+            break;
+        case '2':
+            image_html = "<img src='img/emoji_2.png' class='wheel_text'>";
+            break;
+        case '3':
+            image_html = "<img src='img/emoji_3.png' class='wheel_text'>";
+            break;
+        case '4':
+            image_html = "<img src='img/emoji_4.png' class='wheel_text'>";
+            break;
+    };
+
+    $('#contact_info').html(
+        image_html + "<br>" +
+        "Contact Info: <br>" +
+        randomRestaurantsDetails[index]['name'] + "<br>" +
+        randomRestaurantsDetails[index]['address'] + "<br>" +
+        randomRestaurantsDetails[index]['phone'] + "<br>"
+    );
+
 }
 
 function drawRouletteWheel() {
