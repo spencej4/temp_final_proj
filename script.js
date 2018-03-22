@@ -1,4 +1,5 @@
 let map; //The map variable that is an instance of a google.maps.Map is local to the initialize function. 
+let bounds;
 //this forces global scope of map to be reused and initialized in further function calls
 // The following are used in the Wheel of Danger feature
 var options = [];
@@ -97,27 +98,23 @@ $(window).load(function() {
             })
             .done(function() {
                 markersArray = [];
-
+                var bounds = new google.maps.LatLngBounds();
                 $.each(myData, function(i, entry) {
-                    //console.log(entry); // for testing // logs each entry to console as an object
                     marker = new google.maps.Marker({
                         position: new google.maps.LatLng(entry.latitude, entry.longitude),
                         map: map,
                         title: entry.name
                     });
                     markersArray.push(marker);
+                    bounds.extend(marker.position); //extend the bounds to include each marker's position
                     // zooms map in to marker location when user clicks marker
                     marker.addListener('click', function() {
                         map.setZoom(20);
                         map.setCenter(marker.getPosition());
                     });
                 });
-                // save first data location lat/lng as variables
-                let tempLat = (parseFloat(myData[0].latitude));
-                let tempLong = (parseFloat(myData[0].longitude));
-                // pass variables into object literal
-                // and center map on location
-                map.setCenter({ lat: tempLat, lng: tempLong });
+                // map should recenter to include every marker
+                map.fitBounds(bounds);
             });
         // add error handling
         searchParams = { 'zipcode': "", 'grade': "" };
@@ -182,6 +179,8 @@ function makeRestaurantSummaryText(randomRestaurantsDetails, index) {
         "Contact Info: <br>" +
         randomRestaurantsDetails[index]['name'] + "<br>" +
         randomRestaurantsDetails[index]['address'] + "<br>" +
+        randomRestaurantsDetails[index]['city'] + ", WA " +
+        randomRestaurantsDetails[index]['zip_code'] + "<br>" +
         randomRestaurantsDetails[index]['phone'] + "<br>"
     );
 
