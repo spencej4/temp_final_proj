@@ -1,13 +1,14 @@
-
 .clearfix:after {
      clear: both;
      content: '';
      display: table;
      height: 0;
- }
- * {
+}
+
+* {
      box-sizing: border-box;
- }
+}
+
 html{
 	height: 100%;
 	margin: 0;
@@ -26,6 +27,7 @@ body {
 .hidden {
     display: none;
 }
+
 .sidenav {
     height: 100%;
     width: 160px; /* Set the width of the sidebar */
@@ -42,7 +44,19 @@ body {
 
 #inputForm{
     margin-left: 8px;
+    border-color: ;
 }
+
+.defaultInput{
+     height: 25px;
+     border-color: none;
+}
+
+.error {
+    border-color: red;
+    box-shadow: 0 0 3px #CC0000;
+}
+
 
 #grade_picker {
     width: 100%;
@@ -93,6 +107,7 @@ body {
     cursor: pointer;
     font-size: 18px;
 }
+
 #submitButton:focus,
 #resetButton:focus {
     outline:0;
@@ -113,32 +128,32 @@ body {
     font-family: "Helvetica Neue";
 }
 
- #map {
+#map {
  	height: 70%;
- }
+}
 
- #wheel_comics {
+#wheel_comics {
     margin-left: 20%;
 
- }
+}
  
- .wheel_format {
+.wheel_format {
      align-items: center;
      overflow: hidden;
      width: 100%;
      padding-left: 200px;
      display: flex;
- }
+}
  
- #wheel_picture {
+#wheel_picture {
     float: left;
     overflow: hidden;
- }
+}
  
- #canvas {
- }
+#canvas {
+}
  
- #wheel_text {
+#wheel_text {
     margin-top: 0px;
     float: left;
- }
+}
