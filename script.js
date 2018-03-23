@@ -1,5 +1,4 @@
 let map; //The map variable that is an instance of a google.maps.Map is local to the initialize function. 
-let bounds;
 //this forces global scope of map to be reused and initialized in further function calls
 // The following are used in the Wheel of Danger feature
 var options = [];
@@ -11,7 +10,10 @@ var spinArcStart = 10;
 var spinTime = 0;
 var spinTimeTotal = 0;
 var ctx;
-
+let zipStart = 98101; 
+let zipEnd = 98199; 
+let zips = [];
+let markersArray = [];
 
 $(window).load(function() {
     // Intialize our map
@@ -36,13 +38,13 @@ $(window).load(function() {
         return ("https://data.kingcounty.gov/resource/gkhn-e8mn.json?" + searchParamString);
     }
 
+
     // Get restaurant grade when user clicks smiley face
     $('#grades li').click(function(e) {
         switch (true) {
             case this.id == "1":
                 // dynamically set value of input grade (hardcoded)
                 $("#inputForm").find('input[name="grade"]').val("1");
-                //$("#grades li").slideUp();
                 $(this).siblings().slideUp('fast');
                 break;
             case this.id == "2":
@@ -64,6 +66,7 @@ $(window).load(function() {
     $('#resetButton').click(function() {
         $('#inputForm')[0].reset();
         $('#grades li').slideDown("fast");
+        $('#zipCodeInputField').removeClass('error').addClass('defaultInput');
         clearOverlays();
     });
 
@@ -73,23 +76,49 @@ $(window).load(function() {
         for (var i = 0; i < markersArray.length; i++) {
             markersArray[i].setMap(null);
         }
-        myData = null; // set data to null
+        myData = null; // clear data cache
         $('#contact_info').html(""); // clear the contact info
         ctx.clearRect(0, 0, 500, 500); // clear the roulette wheel
     }
 
-    // User submits form
+    // Buid the array of zipcodes
+    while(zipStart < zipEnd +1) {
+        zips.push(zipStart++);
+    }
+
+    // Run input zipcode value through zips array
+    function checkZip(val) {
+        for (var i = 0; i < zips.length + 1; i++) {
+            // zipcode match found
+            if (zips.indexOf(val) > -1) { 
+                $('#zipCodeInputField').removeClass('error').addClass('defaultInput');
+                inputZIP = null;
+                return
+            }
+        }
+        // zipcode match not found
+        $('#zipCodeInputField').addClass('error');
+        alert("Please enter a valid Seattle zipcode");
+        inputZIP = null;
+    }
+                
+      
+    // Submit form
     $("#inputForm").submit(function(e) {
         e.preventDefault(); //added to prevent form submission from reloading the page
         let inputZIP = $('#inputForm').find('input[name="searchZIP"]').val();
         let inputGrade = $('#inputForm').find('input[name="grade"]').val();
+        // turn  zipcode string into number
+        inputZIP = Number(inputZIP);
+        // pass zipcode as parameter to checkzip function
+        checkZip(inputZIP);
         // make sure the key in searchParams is a valid field in the Food Safety database
         let searchParams = {
             'zip_code': inputZIP,
             'grade': inputGrade,
-        };
-        myData = null;
+        }; 
         searchURL = generateURL(searchParams);
+
 
         // Retrieve our data and plot it
         $.getJSON(searchURL, function(data, textstatus) {
@@ -97,28 +126,30 @@ $(window).load(function() {
                 if (myData.length > 0) { implementWheelOfDanger(myData) };
             })
             .done(function() {
-                markersArray = [];
-                var bounds = new google.maps.LatLngBounds();
                 $.each(myData, function(i, entry) {
+                    // console.log(entry); // for testing // logs each entry to console as an object
                     marker = new google.maps.Marker({
                         position: new google.maps.LatLng(entry.latitude, entry.longitude),
                         map: map,
                         title: entry.name
                     });
                     markersArray.push(marker);
-                    bounds.extend(marker.position); //extend the bounds to include each marker's position
                     // zooms map in to marker location when user clicks marker
                     marker.addListener('click', function() {
                         map.setZoom(20);
                         map.setCenter(marker.getPosition());
                     });
                 });
-                // map should recenter to include every marker
-                map.fitBounds(bounds);
-            });
-        // add error handling
-        searchParams = { 'zipcode': "", 'grade': "" };
-    });
+                // save first data location lat/lng as variables
+                let tempLat = (parseFloat(myData[0].latitude));
+                let tempLong = (parseFloat(myData[0].longitude));
+                // pass variables into object literal
+                // and center map on location
+                map.setCenter({ lat: tempLat, lng: tempLong });
+                map.setZoom(13);
+            })
+        // add error handling... nope
+        });
 
 
     function implementWheelOfDanger(myData) {
@@ -132,7 +163,7 @@ $(window).load(function() {
             if (randomRestaurants.indexOf(newRestaurant) !== -1 || !('grade' in myData[newIndex])) {
                 j++;
                 continue;
-            } //try avoiding duplicates until we run out of restaurants, skip over rows with no 'grade'
+            } // try avoiding duplicates until we run out of restaurants, skip over rows with no 'grade'
             randomRestaurants.push(newRestaurant);
             randomRestaurantsDetails.push(myData[newIndex]);
             i++;
@@ -144,7 +175,7 @@ $(window).load(function() {
         drawRouletteWheel();
         document.getElementById("spin_button").addEventListener("click", spin);
     }
-});
+})
 
 function getColor(item, maxitem) {
     if (item % 3 === 0) {
@@ -179,8 +210,6 @@ function makeRestaurantSummaryText(randomRestaurantsDetails, index) {
         "Contact Info: <br>" +
         randomRestaurantsDetails[index]['name'] + "<br>" +
         randomRestaurantsDetails[index]['address'] + "<br>" +
-        randomRestaurantsDetails[index]['city'] + ", WA " +
-        randomRestaurantsDetails[index]['zip_code'] + "<br>" +
         randomRestaurantsDetails[index]['phone'] + "<br>"
     );
 
@@ -277,5 +306,3 @@ function easeOut(t, b, c, d) {
     var tc = ts * t;
     return b + c * (tc + -3 * ts + 3 * t);
 }
-
-
