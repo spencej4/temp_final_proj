@@ -1,6 +1,7 @@
 let map; //The map variable that is an instance of a google.maps.Map is local to the initialize function. 
 //this forces global scope of map to be reused and initialized in further function calls
 // The following are used in the Wheel of Danger feature
+let bounds;
 var options = [];
 var optionsDetails = [];
 var arc;
@@ -10,7 +11,7 @@ var spinArcStart = 10;
 var spinTime = 0;
 var spinTimeTotal = 0;
 var ctx;
-let zipStart = 98101; 
+let zipStart = 98001; 
 let zipEnd = 98199; 
 let zips = [];
 let markersArray = [];
@@ -108,10 +109,10 @@ $(window).load(function() {
         e.preventDefault(); //added to prevent form submission from reloading the page
         let inputZIP = $('#inputForm').find('input[name="searchZIP"]').val();
         let inputGrade = $('#inputForm').find('input[name="grade"]').val();
-        // turn  zipcode string into number
-        inputZIP = Number(inputZIP);
-        // pass zipcode as parameter to checkzip function
-        checkZip(inputZIP);
+        if (inputZIP !== "") {
+            inputZIP = Number(inputZIP);
+            checkZip(inputZIP)
+        };
         // make sure the key in searchParams is a valid field in the Food Safety database
         let searchParams = {
             'zip_code': inputZIP,
@@ -126,27 +127,22 @@ $(window).load(function() {
                 if (myData.length > 0) { implementWheelOfDanger(myData) };
             })
             .done(function() {
+                var bounds = new google.maps.LatLngBounds();
                 $.each(myData, function(i, entry) {
-                    // console.log(entry); // for testing // logs each entry to console as an object
                     marker = new google.maps.Marker({
                         position: new google.maps.LatLng(entry.latitude, entry.longitude),
                         map: map,
                         title: entry.name
                     });
                     markersArray.push(marker);
+                    bounds.extend(marker.position); //extend the bounds to include each marker's position
                     // zooms map in to marker location when user clicks marker
                     marker.addListener('click', function() {
-                        map.setZoom(20);
                         map.setCenter(marker.getPosition());
                     });
                 });
-                // save first data location lat/lng as variables
-                let tempLat = (parseFloat(myData[0].latitude));
-                let tempLong = (parseFloat(myData[0].longitude));
-                // pass variables into object literal
-                // and center map on location
-                map.setCenter({ lat: tempLat, lng: tempLong });
-                map.setZoom(13);
+                // map should recenter to include every marker
+                map.fitBounds(bounds);
             })
         // add error handling... nope
         });
@@ -210,6 +206,8 @@ function makeRestaurantSummaryText(randomRestaurantsDetails, index) {
         "Contact Info: <br>" +
         randomRestaurantsDetails[index]['name'] + "<br>" +
         randomRestaurantsDetails[index]['address'] + "<br>" +
+        randomRestaurantsDetails[index]['city'] + ", WA " +
+        randomRestaurantsDetails[index]['zip_code'] + "<br>" +
         randomRestaurantsDetails[index]['phone'] + "<br>"
     );
 
