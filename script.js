@@ -1,7 +1,8 @@
 let map; //The map variable that is an instance of a google.maps.Map is local to the initialize function. 
 //this forces global scope of map to be reused and initialized in further function calls
-// The following are used in the Wheel of Danger feature
 let bounds;
+let markersArray = [];
+// The following are used in the Wheel of Danger feature
 var options = [];
 var optionsDetails = [];
 var arc;
@@ -11,10 +12,10 @@ var spinArcStart = 10;
 var spinTime = 0;
 var spinTimeTotal = 0;
 var ctx;
+// The following are used in validation
 let zipStart = 98001; 
 let zipEnd = 98199; 
 let zips = [];
-let markersArray = [];
 
 $(window).load(function() {
     // Intialize our map
@@ -103,12 +104,12 @@ $(window).load(function() {
         inputZIP = null;
     }
                 
-      
     // Submit form
     $("#inputForm").submit(function(e) {
         e.preventDefault(); //added to prevent form submission from reloading the page
         let inputZIP = $('#inputForm').find('input[name="searchZIP"]').val();
         let inputGrade = $('#inputForm').find('input[name="grade"]').val();
+        // ZIP code is not required, but if provided, check it
         if (inputZIP !== "") {
             inputZIP = Number(inputZIP);
             checkZip(inputZIP)
@@ -121,7 +122,7 @@ $(window).load(function() {
         searchURL = generateURL(searchParams);
 
 
-        // Retrieve our data and plot it
+        // Retrieve our data and create Wheel of Danger if data returned, then map it
         $.getJSON(searchURL, function(data, textstatus) {
                 myData = data;
                 if (myData.length > 0) { implementWheelOfDanger(myData) };
@@ -144,9 +145,7 @@ $(window).load(function() {
                 // map should recenter to include every marker
                 map.fitBounds(bounds);
             })
-        // add error handling... nope
         });
-
 
     function implementWheelOfDanger(myData) {
         let randomRestaurants = [];
@@ -156,10 +155,11 @@ $(window).load(function() {
         while (i < 15 && j < myData.length - 1) {
             let newIndex = Math.floor(Math.random() * myData.length);
             let newRestaurant = myData[newIndex]["name"];
+            // try avoiding duplicates until we run out of restaurants, skip over rows with no 'grade'
             if (randomRestaurants.indexOf(newRestaurant) !== -1 || !('grade' in myData[newIndex])) {
                 j++;
                 continue;
-            } // try avoiding duplicates until we run out of restaurants, skip over rows with no 'grade'
+            }
             randomRestaurants.push(newRestaurant);
             randomRestaurantsDetails.push(myData[newIndex]);
             i++;
@@ -173,16 +173,18 @@ $(window).load(function() {
     }
 })
 
-function getColor(item, maxitem) {
-    if (item % 3 === 0) {
-        return '#5e795b'
-    } else if (item % 3 === 1) {
-        return '#edefe5'
+// select one of three colors depending on index 
+function getColor(index) {
+    if (index % 3 === 0) {
+        return '#5e795b';
+    } else if (index % 3 === 1) {
+        return '#edefe5';
     } else {
-        return '#6e4959'
+        return '#6e4959';
     }
 };
 
+// generate HTML for contact info summary for selected restaurant
 function makeRestaurantSummaryText(randomRestaurantsDetails, index) {
     let grade = randomRestaurantsDetails[index]['grade'];
     var image_html = "";
@@ -200,7 +202,7 @@ function makeRestaurantSummaryText(randomRestaurantsDetails, index) {
             image_html = "<img src='img/emoji_4.png' class='wheel_text'>";
             break;
     };
-
+    
     $('#contact_info').html(
         image_html + "<br>" +
         "Contact Info: <br>" +
@@ -210,9 +212,10 @@ function makeRestaurantSummaryText(randomRestaurantsDetails, index) {
         randomRestaurantsDetails[index]['zip_code'] + "<br>" +
         randomRestaurantsDetails[index]['phone'] + "<br>"
     );
+};
 
-}
-
+// Function that draws a roulette wheel and arrow
+// This is a modified version of code found at https://codepen.io/barney-parker/pen/OPyYqy
 function drawRouletteWheel() {
     var canvas = document.getElementById("canvas");
     if (canvas.getContext) {
@@ -230,7 +233,7 @@ function drawRouletteWheel() {
 
         for (var i = 0; i < numOptions.length; i++) {
             var angle = startAngle + i * arc;
-            ctx.fillStyle = getColor(i, numOptions.length);
+            ctx.fillStyle = getColor(i);
 
             ctx.beginPath();
             ctx.arc(250, 250, outsideRadius, angle, angle + arc, false);
@@ -265,15 +268,17 @@ function drawRouletteWheel() {
         ctx.lineTo(250 - 4, 250 - (outsideRadius + 5));
         ctx.fill();
     }
-}
+};
 
+// generate initial conditions for spinning roulette wheel then start wheel spin
 function spin() {
     spinAngleStart = Math.random() * 10 + 10;
     spinTime = 0;
     spinTimeTotal = Math.random() * 3 + 10 * 1000;
     rotateWheel();
-}
+};
 
+// spin wheel using initial conditions until time to stop
 function rotateWheel() {
     spinTime += 30;
     if (spinTime >= spinTimeTotal) {
@@ -284,8 +289,10 @@ function rotateWheel() {
     startAngle += (spinAngle * Math.PI / 180);
     drawRouletteWheel();
     spinTimeout = setTimeout('rotateWheel()', 5);
-}
+};
 
+// stop wheel rotation, get index of place in array representing selected spot on wheel,
+// then generate HTML to summarize selected restaurant
 function stopRotateWheel() {
     clearTimeout(spinTimeout);
     var degrees = startAngle * 180 / Math.PI + 90;
@@ -297,8 +304,9 @@ function stopRotateWheel() {
     ctx.fillText(text, 250 - ctx.measureText(text).width / 2, 250 + 10);
     ctx.restore();
     makeRestaurantSummaryText(optionsDetails, index);
-}
+};
 
+// As t (spinTime) increases, the cubic term (tc) gets larger, resulting in a larger return value
 function easeOut(t, b, c, d) {
     var ts = (t /= d) * t;
     var tc = ts * t;
